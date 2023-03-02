@@ -1,12 +1,11 @@
 import Head from "next/head";
-import { unstable_getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { GetServerSideProps } from "next";
 import { Session } from "next-auth";
-import Image from "next/image";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
-
+import Image from "next/image";
 interface Props {
   session: Session;
 }
@@ -16,7 +15,6 @@ export default function Home({ session }: Props) {
   const myLoader = ({ src }: { src: string }) => {
     return src;
   };
-
   return (
     <div>
       <Head>
@@ -28,14 +26,14 @@ export default function Home({ session }: Props) {
       <main className="flex flex-col justify-center items-center gap-y-2">
         <h1 className="py-4 text-3xl font-bold text-center">NextAuth</h1>
         <h2 className="text-center text-4xl font-bold">
-          {session.user?.name === undefined
+          {session.user.name === null
             ? session.user?.email?.slice(0, index)
             : session.user?.name}
         </h2>
         <Image
           loader={myLoader}
           src={
-            session.user?.image === undefined
+            session.user?.image === null
               ? "https://cdn-icons-png.flaticon.com/128/64/64572.png"
               : (session.user?.image as string)
           }
@@ -44,6 +42,7 @@ export default function Home({ session }: Props) {
           alt="image"
           className="rounded-full bg-white"
           unoptimized={true}
+          priority={true}
         />
         <button
           className="px-4 py-1 bg-red-600 text-white font-bold rounded"
@@ -57,8 +56,8 @@ export default function Home({ session }: Props) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const session = await unstable_getServerSession(req, res, authOptions);
-
+  const session = await getServerSession(req, res, authOptions);
+  console.log(session)
   if (!session) {
     return {
       redirect: {

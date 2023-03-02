@@ -1,33 +1,30 @@
 import { GetServerSideProps } from "next";
-import { unstable_getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import { signIn } from "next-auth/react";
-import { FormEvent, useRef } from "react";
+import { FormEvent, useEffect, useRef } from "react";
 import { authOptions } from "./api/auth/[...nextauth]";
+import Link from "next/link";
 
-const Signin = () => {
-  const email = useRef<HTMLInputElement>(null);
+const SignIn = () => {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   const handleForm = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email.current?.value) return;
+    if (!emailRef.current?.value || !passwordRef.current?.value) return;
 
-    await fetch("api/auth/signin", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ strategy: "database" }),
+    const data = await signIn("credentials", {
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
     });
-
-    const data = await signIn("email", {
-      email: email.current?.value,
-    });
-
-    console.log(data);
   };
+
+  useEffect(() => {
+    if (window.location.href.includes("#")) window.location.replace("/");
+  }, []);
   return (
     <div>
-      <h1 className="py-4 text-3xl font-bold text-center">SignIn</h1>
+      <h1 className="py-4 text-3xl font-bold text-center">Sign In</h1>
       <div className="space-y-2 flex justify-center items-center">
         <form
           className="w-72 p-6 border border-white rounded-xl flex flex-col gap-y-4"
@@ -41,10 +38,23 @@ const Signin = () => {
               Email
             </label>
             <input
-              ref={email}
-              type="text"
-              name="email"
+              ref={emailRef}
+              type="email"
+              name="Email"
               placeholder="Enter your email"
+              className="mt-1 w-full p-2 text-lg text-stone-300 border border-stone-800 rounded bg-transparent flex justify-center items-center gap-x-2"
+            />
+              <label
+              htmlFor="password"
+              className="mt-2 block text-lg font-medium text-white"
+            >
+              Password
+            </label>
+            <input
+              ref={passwordRef}
+              type="password"
+              name="Password"
+              placeholder="Enter your password"
               className="mt-1 w-full p-2 text-lg text-stone-300 border border-stone-800 rounded bg-transparent flex justify-center items-center gap-x-2"
             />
           </div>
@@ -52,9 +62,9 @@ const Signin = () => {
             type="submit"
             className="w-full p-2 text-lg text-stone-300 font-medium border border-stone-800 rounded flex justify-center items-center gap-x-2"
           >
-            <span>Sign in with Email</span>
+            <span>Login</span>
           </button>
-          <button
+          {/* <button
             className="p-2 text-lg text-stone-300 font-medium border border-stone-800 rounded flex justify-center items-center gap-x-2"
             onClick={async () => {
               await fetch("api/auth/signin", {
@@ -85,7 +95,7 @@ const Signin = () => {
               ></path>
             </svg>
             <span>Sign in with Google</span>
-          </button>
+          </button> */}
           <button
             className="p-2 text-lg text-stone-300 font-medium border border-stone-800 rounded flex justify-center items-center gap-x-2"
             onClick={async () => {
@@ -116,6 +126,7 @@ const Signin = () => {
             </svg>
             <span>Sign in with Github</span>
           </button>
+          <Link href="/signup" className="text-center font-medium text-blue-500">Sing up</Link>
         </form>
       </div>
     </div>
@@ -123,7 +134,7 @@ const Signin = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const session = await unstable_getServerSession(req, res, authOptions);
+  const session = await getServerSession(req, res, authOptions);
   if (session) {
     return {
       redirect: {
@@ -138,4 +149,4 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-export default Signin;
+export default SignIn;
