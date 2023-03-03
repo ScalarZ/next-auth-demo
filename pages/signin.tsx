@@ -44,7 +44,7 @@ const SignIn = () => {
               placeholder="Enter your email"
               className="mt-1 w-full p-2 text-lg text-stone-300 border border-stone-800 rounded bg-transparent flex justify-center items-center gap-x-2"
             />
-              <label
+            <label
               htmlFor="password"
               className="mt-2 block text-lg font-medium text-white"
             >
@@ -99,13 +99,6 @@ const SignIn = () => {
           <button
             className="p-2 text-lg text-stone-300 font-medium border border-stone-800 rounded flex justify-center items-center gap-x-2"
             onClick={async () => {
-              await fetch("api/auth/signin", {
-                method: "POST",
-                headers: {
-                  "content-type": "application/json",
-                },
-                body: JSON.stringify({ strategy: "jwt" }),
-              });
               signIn("github");
             }}
           >
@@ -126,7 +119,20 @@ const SignIn = () => {
             </svg>
             <span>Sign in with Github</span>
           </button>
-          <Link href="/signup" className="text-center font-medium text-blue-500">Sing up</Link>
+          <button
+            className="p-2 text-lg text-stone-300 font-medium border border-stone-800 rounded flex justify-center items-center gap-x-2"
+            onClick={async () => {
+              signIn("instagram");
+            }}
+          >
+            <span>Sign in with Instagram</span>
+          </button>
+          <Link
+            href="/signup"
+            className="text-center font-medium text-blue-500"
+          >
+            Sing up
+          </Link>
         </form>
       </div>
     </div>
